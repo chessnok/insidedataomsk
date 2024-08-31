@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Team Name and Logo -->
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Inside Data</h1>
+        </div>
+        <div class="col-md-4 text-right">
+            <img src="{% static 'images/logo.png' %}" alt="Inside Data Logo" class="img-fluid" style="max-height: 100px;">
+        </div>
+    </div>
+
+    <!-- Problem Description -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <p class="lead">
+                С каждым годом лесные пожары становятся всё более частыми и разрушительными, представляя серьёзную угрозу для экосистем и населения. 
+                В 2024 году на территории Российской Федерации уже возникло более 5,5 тысяч лесных пожаров, и площадь, пройденная огнём, превысила 3 миллиона гектаров. 
+                Лесные пожары зависят от множества факторов, включая метеорологические условия, типы растительности, рельеф местности и человеческую деятельность.
+            </p>
+            <p>
+                В условиях изменения климата особенно важно заблаговременно выявлять территории, подверженные повышенному риску возгорания, 
+                чтобы оперативно направлять ресурсы на профилактику и тушение. Участникам требуется разработать модель, которая, используя космические снимки высокого разрешения, 
+                метеоданные и любые дополнительные открытые данные, позволит выделять на заданной территории участки с высоким риском возникновения пожаров в ближайший месяц.
+            </p>
+        </div>
+    </div>
+
+    <!-- Form for Uploading Files -->
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-3">
+            <h2>Заполните нашу прекрасную форму</h2>
+            <form method="post" enctype="multipart/form-data" class="mt-3">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Placeholder for Prediction Results -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Результаты предсказаний</h3>
+            <div id="prediction-results">
+                <!-- This is where the segmented image and prediction details will appear -->
+                <p>После загрузки данных и выполнения анализа, результаты будут показаны здесь.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
