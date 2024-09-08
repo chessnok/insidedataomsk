@@ -144,7 +144,7 @@ def draw_wind_arrow(img, wind_speed, wind_direction, arrow_color=(255, 255, 255)
     except IOError:
         font = ImageFont.load_default()
 
-    text = f"{wind_speed} м/с"
+    text = f"{wind_speed} m/s"
     text_offset = 25  # Смещение текста от конца стрелки
     text_x = end_x + text_offset * math.cos(math.radians(wind_direction))
     text_y = end_y - text_offset * math.sin(math.radians(wind_direction))
