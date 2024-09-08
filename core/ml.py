@@ -1,5 +1,4 @@
 import math
-
 import rasterio
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -106,9 +105,6 @@ def color_mask(image, mask, color=(255, 0, 0)):
     alpha_mask = mask.point(lambda p: p > 128 and 255)  # Преобразуем белые пиксели в альфа-канал
     result_image = Image.composite(color_image, image, alpha_mask)
     return result_image
-
-from PIL import Image, ImageDraw, ImageFont
-import math
 
 def draw_wind_arrow(img, wind_speed, wind_direction, arrow_color=(255, 255, 255), text_size=20):
     draw = ImageDraw.Draw(img)

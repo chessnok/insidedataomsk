@@ -3,7 +3,7 @@ import json
 import requests
 from statistics import mode
 
-team_name = "inside_data"
+team_name = "Inside Data"
 
 
 # Функция для получения ближайшего города по координатам (через Nominatim API)
@@ -13,16 +13,31 @@ def get_nearest_city(latitude, longitude):
         "format": "json",
         "lat": latitude,
         "lon": longitude,
-        "zoom": 10,  # Уровень детализации, 10 - это город
+        "zoom": 10,
         "addressdetails": 1
     }
     try:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             location_data = response.json()
-            city = location_data.get("address", {}).get("city", "Неизвестный город")
+            address = location_data.get("address", {})
+
+            city = address.get("city")
+            town = address.get("town")
+            village = address.get("village")
+            suburb = address.get("suburb")
+            county = address.get("county")
+
             if city:
                 return city
+            elif town:
+                return town
+            elif village:
+                return village
+            elif suburb:
+                return suburb
+            elif county:
+                return county
             else:
                 return location_data.get("display_name", "Неизвестный регион")
         else:
@@ -54,59 +69,54 @@ def wind_direction_to_text(degrees):
 # Функция для получения метеоданных
 def get_historical_weather(latitude, longitude, date):
     url = "https://archive-api.open-meteo.com/v1/era5"
-
-    # Параметры запроса к Open-Meteo API
     params = {
         "latitude": latitude,
         "longitude": longitude,
         "start_date": date,
-        "end_date": date,  # Однодневный интервал
+        "end_date": date,
         "daily": "temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum",
         "hourly": "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,pressure_msl",
         "timezone": "Europe/Moscow"
     }
-
-    # Отправляем запрос
     response = requests.get(url, params=params)
-
     if response.status_code == 200:
-        return response.json()
+        data = response.json()
+        return data
     else:
         return {"error": "Failed to retrieve data", "status_code": response.status_code}
 
 
-# Основная функция для обращения к API и получения всех данных
+# Основная функция API, вызываемая оболочкой
 def call_api(lat, lng, date):
+    results_dict = {}
+
     # Получаем метеоданные
     weather_data = get_historical_weather(lat, lng, date)
 
-    # Определение ближайшего города
+    # Получаем ближайший город
     nearest_city = get_nearest_city(lat, lng)
 
     if "error" not in weather_data:
-        # Извлекаем суточные данные
+        # Получаем данные
         max_temp = weather_data["daily"]["temperature_2m_max"][0]
         min_temp = weather_data["daily"]["temperature_2m_min"][0]
         mean_temp = weather_data["daily"]["temperature_2m_mean"][0]
         precipitation_sum = weather_data["daily"]["precipitation_sum"][0]
 
-        # Извлекаем почасовые данные
         wind_speeds = weather_data["hourly"]["wind_speed_10m"]
         wind_directions = weather_data["hourly"]["wind_direction_10m"]
         pressures = weather_data["hourly"]["pressure_msl"]
+        humidities = weather_data["hourly"]["relative_humidity_2m"]
 
-        # Рассчитываем максимальную скорость ветра
         max_wind_speed = max(wind_speeds)
-
-        # Определяем доминирующее направление ветра
+        max_humidity = max(humidities)
         dominant_wind_direction = mode(wind_directions)
         wind_direction_text = wind_direction_to_text(dominant_wind_direction)
+        avg_pressure = (sum(pressures) / len(pressures)) / 100  # Па в гПа
 
-        # Рассчитываем среднее давление и конвертируем из Па в гПа
-        avg_pressure = (sum(pressures) / len(pressures)) / 100  # Конвертируем Па в гПа
-
-        # Создаем словарь с переменными для возврата
-        weather_variables = {
+        # Создаем результат в виде словаря
+        results_dict = {
+            "location": nearest_city,
             "date": date,
             "temperature_mean": mean_temp,
             "temperature_min": min_temp,
@@ -115,19 +125,20 @@ def call_api(lat, lng, date):
             "wind_speed_max": max_wind_speed,
             "wind_direction_degrees": dominant_wind_direction,
             "wind_direction_text": wind_direction_text,
-            "pressure_msl": avg_pressure
+            "pressure_msl": avg_pressure,
+            "humidity_max": max_humidity
         }
-        return weather_variables
-    else:
-        return {"error": weather_data["error"], "status_code": weather_data["status_code"]}
+
+    return results_dict
 
 
 # Функция для сохранения результатов в JSON файл
 def save_json(data, file_path):
     with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+        json.dump(data, f)
 
 
+# Главная часть программы
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--lat", type=float, help="Широта")
@@ -140,5 +151,6 @@ if __name__ == "__main__":
         parser.print_help()
         exit(1)
 
+    # Вызов функции API и сохранение результата в JSON
     results = call_api(args.lat, args.lng, args.date)
     save_json(results, f'{team_name}.json')
