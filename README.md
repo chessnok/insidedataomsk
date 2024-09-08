@@ -24,6 +24,8 @@
 3. Перейти по адресу http://localhost:8000/
 4. Загрузить файлы в форму "Загрузить данные"
 
+P.S. Так же решение доступно по ссылке http://insidedata.tech/
 ## Связаться с нами
+
 - [Telegram](https://t.me/GeorgeWangg)
 - [Telegram](https://t.me/mikhailfadin)
