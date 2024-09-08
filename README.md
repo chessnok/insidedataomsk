@@ -18,6 +18,7 @@
 ## Запуск проекта
 1. Установить зависимости
 ```bash pip install -r requirements.txt```
+```python manage.py migrate```
 2. Запустить проект
 ```bash python manage.py runserver```
 3. Перейти по адресу http://localhost:8000/
