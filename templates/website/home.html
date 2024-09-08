@@ -28,25 +28,38 @@
         </div>
     </div>
 
-    <!-- Form for Uploading Files -->
     <div class="row mt-4">
         <div class="col-md-6 offset-md-3">
-            <h2>Заполните нашу прекрасную форму</h2>
-            <form method="post" enctype="multipart/form-data" class="mt-3">
+            <h2>Введите сюда данные из api и файл.</h2>
+            <form method="post" {% if form.is_multipart %} enctype="multipart/form-data" {% endif %} class="mt-3">
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit" class="btn btn-primary btn-block">Submit</button>
             </form>
         </div>
     </div>
-
-    <!-- Placeholder for Prediction Results -->
+        <!-- Отображение списка предсказаний -->
     <div class="row mt-5">
         <div class="col-md-12">
-            <h3>Результаты предсказаний</h3>
-            <div id="prediction-results">
-                <!-- This is where the segmented image and prediction details will appear -->
-                <p>После загрузки данных и выполнения анализа, результаты будут показаны здесь.</p>
+            <h3>Список операций</h3>
+            <div class="row">
+                {% for prediction in predictions %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Операция #{{ prediction.id }}</h5>
+                                <p class="card-text"><strong>Температура:</strong> {{ prediction.temperature }}</p>
+                                <p class="card-text"><strong>Влажность:</strong> {{ prediction.humidity }}</p>
+                                <p class="card-text"><strong>Осадки:</strong> {{ prediction.precipitation }}</p>
+                                <p class="card-text"><strong>Скорость ветра:</strong> {{ prediction.wind_speed }}</p>
+                                <p class="card-text"><strong>Дата создания:</strong> {{ prediction.created_at }}</p>
+                                <a href="{% url 'answer' prediction.id %}" class="btn btn-primary">Перейти к результатам</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>Нет доступных предсказаний.</p>
+                {% endfor %}
             </div>
         </div>
     </div>

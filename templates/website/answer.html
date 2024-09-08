@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="container mt-5">
+        <h3>Детали предсказания:</h3>
+        <ul>
+            <li>Температура: {{ prediction.temperature }}</li>
+            <li>Влажность: {{ prediction.humidity }}</li>
+            <li>Осадки: {{ prediction.precipitation }}</li>
+            <li>Скорость ветра: {{ prediction.wind_speed }}</li>
+            <li>Дата создания: {{ prediction.created_at }}</li>
+        </ul>
+        <img src="{{ prediction.rgb_image.url }}" alt="User Result"
+             class="img-fluid">
+        <h1>Результаты</h1>
+        {% if prediction.status == 'pending' %}
+            <div id="prediction-results">
+                <p>Результатов еще нет.</p>
+            </div>
+        {% else %}
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h3>Результаты предсказаний</h3>
+                    <div id="prediction-results">
+                        <p>После загрузки данных и выполнения анализа,
+                            результаты будут
+                            показаны здесь.</p>
+                        <img src="{{ prediction.model_result.url }}"
+                             alt="Prediction Results"
+                             class="img-fluid">
+                        <img src="{{ prediction.user_result.url }}"
+                             alt="User Result"
+                             class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
